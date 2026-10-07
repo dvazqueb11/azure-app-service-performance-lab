@@ -1,0 +1,83 @@
+name: Validate lab
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  application:
+    name: Build and validate lab behaviour
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore
+        run: dotnet restore PerfLab.slnx
+
+      - name: Build
+        run: dotnet build PerfLab.slnx -c Release --no-restore
+
+      # Starts the app in Baseline and Optimized mode and asserts the behaviour the
+      # lab narrative depends on. No Azure resources and no Azure credentials required.
+      - name: Validate lab behaviour
+        shell: pwsh
+        run: ./scripts/smoke-test.ps1
+
+  infrastructure:
+    name: Build and lint Bicep
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Bicep
+        run: az bicep install
+
+      - name: Build and lint template
+        run: az bicep build --file infra/main.bicep --outfile /tmp/main.json
+
+      - name: Check parameters file against the template
+        shell: pwsh
+        run: |
+          $template = Get-Content /tmp/main.json -Raw | ConvertFrom-Json
+          $parameters = Get-Content infra/main.parameters.json -Raw | ConvertFrom-Json
+          $templateNames = $template.parameters.PSObject.Properties.Name
+          $unknown = $parameters.parameters.PSObject.Properties.Name | Where-Object { $_ -notin $templateNames }
+          if ($unknown) {
+            Write-Error "Parameters file contains parameters that do not exist in the template: $($unknown -join ', ')"
+            exit 1
+          }
+          Write-Host "Parameters file matches the template."
+
+  scripts:
+    name: Lint shell and PowerShell scripts
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: ShellCheck
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y shellcheck
+          shellcheck scripts/*.sh
+
+      - name: PSScriptAnalyzer
+        shell: pwsh
+        run: |
+          Install-Module PSScriptAnalyzer -Force -Scope CurrentUser -ErrorAction Stop
+          $results = Invoke-ScriptAnalyzer -Path ./scripts -Recurse -Severity Error
+          if ($results) {
+            $results | Format-Table -AutoSize | Out-String | Write-Host
+            exit 1
+          }
+          Write-Host "No PowerShell script errors found."

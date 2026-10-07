@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/loadgen/">
+    <Project Path="loadgen/PerfLab.LoadGen/PerfLab.LoadGen.csproj" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/PerfLab.Api/PerfLab.Api.csproj" />
+  </Folder>
+</Solution>
