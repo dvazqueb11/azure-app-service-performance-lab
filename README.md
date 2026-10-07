@@ -108,6 +108,7 @@ Bash equivalents live next to each script (`deploy.sh`, `run-load.sh`, `set-mode
 ├── bicepconfig.json            Bicep linter rules, raised to error severity
 ├── scripts/                    deploy / run-load / set-mode / reset / smoke-test / cleanup
 ├── docs/
+│   ├── session-agenda.md       Customer-facing agenda, prerequisites and outcomes
 │   ├── instructor-guide.md     60-minute runsheet, timings, talking points, contingencies
 │   ├── participant-lab.md      Step-by-step lab for participants
 │   ├── solution-guide.md       Answers, root cause, the fix, and how to prove it
