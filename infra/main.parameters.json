@@ -1,0 +1,30 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "namePrefix": {
+      "value": "perflab"
+    },
+    "appServicePlanSku": {
+      "value": "B1"
+    },
+    "labMode": {
+      "value": "Baseline"
+    },
+    "labOrderCount": {
+      "value": 25
+    },
+    "labSimulatedLatencyMs": {
+      "value": 60
+    },
+    "telemetrySamplingRatio": {
+      "value": "1.0"
+    },
+    "logRetentionDays": {
+      "value": 30
+    },
+    "logDailyQuotaGb": {
+      "value": 1
+    }
+  }
+}

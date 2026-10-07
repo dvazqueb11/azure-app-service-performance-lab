@@ -1,0 +1,23 @@
+# Build output
+bin/
+obj/
+artifacts/
+
+# Local load-test results
+results/
+
+# Editors
+.vs/
+.vscode/
+.idea/
+*.user
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Never commit secrets or local overrides
+appsettings.Development.json
+appsettings.Local.json
+*.env
+.env
